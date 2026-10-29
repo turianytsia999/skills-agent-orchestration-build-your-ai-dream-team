@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "name": "Contributor Onboarding Refresh",
+      "owner": "Mona Patel",
+      "status": "On track",
+      "recentActivity": "Reviewed first-time contributor feedback and published the revised welcome checklist.",
+      "priority": "High",
+      "summary": "Makes it easier for new contributors to find a first issue, understand the workflow, and get support."
+    },
+    {
+      "name": "Release Health Automation",
+      "owner": "Diego Ramos",
+      "status": "In progress",
+      "recentActivity": "Added deployment-duration checks to the release report and opened a review for alert thresholds.",
+      "priority": "Medium",
+      "summary": "Provides a shared view of release readiness and highlights signals that need follow-up before shipping."
+    },
+    {
+      "name": "Documentation Search Audit",
+      "owner": "Avery Chen",
+      "status": "Needs review",
+      "recentActivity": "Collected unsuccessful search queries from the last month and grouped the top documentation gaps.",
+      "priority": "Medium",
+      "summary": "Improves discoverability by identifying missing guides and unclear terminology in contributor documentation."
+    },
+    {
+      "name": "Community Office Hours",
+      "owner": "Samira Okafor",
+      "status": "Planning",
+      "recentActivity": "Confirmed a rotating host schedule and drafted a discussion guide for the first session.",
+      "priority": "Low",
+      "summary": "Creates a recurring, welcoming space for contributors to ask questions and share project feedback."
+    }
+  ]
+}

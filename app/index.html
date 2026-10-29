@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="dashboard">
+      <header>
+        <h1>Project Pulse</h1>
+        <p>Track active contributor projects, their current progress, and the work happening next.</p>
+      </header>
+
+      <section aria-labelledby="projects-heading">
+        <h2 id="projects-heading">Active projects</h2>
+        <p id="project-status" role="status" aria-live="polite">Loading projects…</p>
+        <div id="project-list" aria-live="polite" aria-busy="true"></div>
+      </section>
+    </main>
+
+    <template id="project-card-template">
+      <article class="project-card">
+        <h3></h3>
+        <p class="project-summary"></p>
+        <dl class="project-meta">
+          <div>
+            <dt>Owner</dt>
+            <dd class="project-owner"></dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd class="project-status-value status"></dd>
+          </div>
+          <div>
+            <dt>Recent activity</dt>
+            <dd class="project-activity"></dd>
+          </div>
+          <div>
+            <dt>Priority</dt>
+            <dd class="project-priority priority"></dd>
+          </div>
+        </dl>
+      </article>
+    </template>
+
+    <script>
+      (() => {
+        const fields = ["name", "owner", "status", "recentActivity", "priority", "summary"];
+        const list = document.querySelector("#project-list");
+        const statusMessage = document.querySelector("#project-status");
+        const template = document.querySelector("#project-card-template");
+
+        function valueFor(project, field) {
+          const value = project[field];
+          return typeof value === "string" && value.trim() ? value : "Not provided";
+        }
+
+        function normalizedValue(value) {
+          return value.toLowerCase().trim().replace(/\s+/g, "-");
+        }
+
+        function displayMessage(message, state) {
+          list.replaceChildren();
+          list.setAttribute("aria-busy", "false");
+          const messageElement = document.createElement("p");
+          messageElement.className = "project-message message";
+          messageElement.dataset.state = state;
+          messageElement.textContent = message;
+          list.append(messageElement);
+          statusMessage.textContent = message;
+        }
+
+        function renderProjects(projects) {
+          const cards = document.createDocumentFragment();
+
+          projects.forEach((project) => {
+            const card = template.content.cloneNode(true);
+            card.querySelector("h3").textContent = valueFor(project, "name");
+            card.querySelector(".project-summary").textContent = valueFor(project, "summary");
+            card.querySelector(".project-owner").textContent = valueFor(project, "owner");
+            const statusValue = valueFor(project, "status");
+            const statusElement = card.querySelector(".project-status-value");
+            statusElement.textContent = statusValue;
+            statusElement.dataset.status = normalizedValue(statusValue);
+            card.querySelector(".project-activity").textContent = valueFor(project, "recentActivity");
+            const priorityValue = valueFor(project, "priority");
+            const priorityElement = card.querySelector(".project-priority");
+            priorityElement.textContent = priorityValue;
+            priorityElement.dataset.priority = normalizedValue(priorityValue);
+            cards.append(card);
+          });
+
+          list.replaceChildren(cards);
+          list.setAttribute("aria-busy", "false");
+          statusMessage.textContent = `${projects.length} projects loaded.`;
+        }
+
+        fetch("project-data.json")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Request failed with status ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (!data || !Array.isArray(data.projects)) {
+              displayMessage("Project data is malformed. Please check the project data file.", "malformed-data");
+              return;
+            }
+
+            if (data.projects.length === 0) {
+              displayMessage("No projects are available right now.", "empty");
+              return;
+            }
+
+            if (!data.projects.every((project) => project && typeof project === "object")) {
+              displayMessage("Project data is malformed. Please check the project data file.", "malformed-data");
+              return;
+            }
+
+            renderProjects(data.projects);
+          })
+          .catch(() => {
+            displayMessage("Unable to load projects. Please try again later.", "fetch-error");
+          });
+      })();
+    </script>
+  </body>
+</html>
